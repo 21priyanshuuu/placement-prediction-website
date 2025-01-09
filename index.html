@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CGPA and IQ Predictor</title>
+    <link rel="stylesheet" href="style.css">
+
+</head>
+<body>
+    <h1>Predict Output</h1>
+    <form id="predict-form" class="formip">
+        <label for="cgpa" class="labelcg">CGPA:</label>
+        <input type="number" id="cgpa" name="cgpa" step="0.01" required class="ipcg"><br><br>
+        
+        <label for="iq" class="liq">IQ:</label>
+        <input type="number" id="iq" name="iq" required class="iiq"><br><br>
+        
+        <button type="submit" class="button">Predict</button>
+    </form>
+
+    <!-- Display the result -->
+    <h2 id="result">Prediction will appear here.</h2>
+
+    <script>
+        // Get form and result element
+        const form = document.getElementById('predict-form');
+        const resultElement = document.getElementById('result');
+
+        // Add event listener to form submission
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault(); // Prevent default form submission behavior
+
+            // Get input values
+            const cgpa = parseFloat(document.getElementById('cgpa').value);
+            const iq = parseFloat(document.getElementById('iq').value);
+
+            try {
+                // Fetch the prediction from the server
+                const response = await fetch('http://127.0.0.1:5000/predict', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ cgpa, iq }), // Send data as JSON
+                });
+
+                if (!response.ok) {
+                    throw new Error('Failed to fetch prediction');
+                }
+
+                const data = await response.json(); // Parse response JSON
+
+                // Update the result element with the prediction
+                resultElement.textContent = `Prediction: ${data.prediction}`;
+                resultElement.style.color = 'green'; // Optional styling for success
+            } catch (error) {
+                // Show an error message on the screen
+                resultElement.textContent = 'Error fetching the prediction. Please try again.';
+                resultElement.style.color = 'red'; // Optional styling for error
+                console.error('Error:', error); // Log the error for debugging
+            }
+        });
+    </script>
+</body>
+</html>
